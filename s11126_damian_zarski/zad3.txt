@@ -1,0 +1,78 @@
+BASH#3 petle, petle, funkcje, instrukcje warunkowe, tablice
+teoria:
+PETLE
+if warunek
+then
+ ....
+elif warunek
+then
+ ...
+else
+ ...
+fi
+
+(przyklad)
+if [[ "abc" != "$1" ]]; then
+  echo "parametr to nie abc"
+fi
+
+TABLICA=(element1 "element 2" element\ 3) - deklaracje tablicy z elemntami
+echo ${TABLICA[1]}			  - dostep do pierwszego elementu tablicy
+echo ${TABLICA[*]}			  - wszystkie elementy tablicy jako jedna wartosc
+echo ${TABLICA[@]}			  - wszystkie elementy tablicy jako oddzielne wartosci
+echo ${TABLICA[*]}			  - liczba elementow w tablicy
+
+
+--------------------------------------------
+
+CW
+#!/bin/bash                                                                   
+
+if [ $# -gt 1 ]; then
+        echo $1;
+else
+        echo "Nie podano parametrow";
+fi
+
+
+
+CW
+#!/bin/bash                                                                   
+
+if [ -e config.cfg ]; then
+        ./config.cfg
+elif [ $# -gt 0 ]; then
+        ./$1
+else
+        echo "blad"
+fi
+
+
+
+CW
+#!/bin/bash                                                                   
+
+FILENAME=$(basename $0)
+NAME="${FILENAME%.*}"
+EXT="${FILENAME##*.}"
+
+if [[ $EXT != "sh" ]]; then
+        mv $0 ${0}.sh
+fi
+
+
+
+CW
+#!/bin/bash                                                                   
+
+FILENAME=$(basename $0)
+
+NAME="${FILENAME%.*}"
+
+EXT="${FILENAME##*.}"
+
+if [[ $EXT != "sh" ]]; then
+
+        mv $0 ${0}.sh
+
+fi
