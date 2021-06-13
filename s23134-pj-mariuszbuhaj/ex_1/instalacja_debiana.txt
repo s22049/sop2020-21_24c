@@ -1,0 +1,56 @@
+2021.03.18 Instalowanie Debiana na maszynie wirtualnej.
+
+Na zajeciach zajmowalem sie instalacja systemu Debian, ktory jest projektem wolnej dystrybucji systemu operacyjnego GNU/Linux oraz GNU/kFreeBSD. Ponizej przedstawiam instalacji Debiana na maszynie wirtualnej.
+
+1. Pobranie Debiana
+
+2.Tworzenie maszyny wirtualnej.
+2.1 Wybor nazwy, folderu docelowego instalacji maszyny wirtualnej oraz typu wersji
+2.2 Wybor ilosci pamieci RAM w megabajtach, ktora zostanie przydzielona dla wirtualnej maszyny. Powinna byc to wielokrotnosc 2.
+2.3 Dodanie wirtualnego dysku do nowej maszyny. Mozna stworzyc calkowicie nowy dysk twardy, uzyc instniejacego lub w ogole nie dodawac nowego dysku.
+2.3.1 Wybor formatu pliku do uzycia z nowym wirtualnym dyskiem twardym. Do wyboru sa trzy typy:
+-VDI (VirtualBox Disk Image) - format virtualboxa
+-VHD (Virtual Hard Disk) - obraz dysko twardego w formacie microsoftowym
+-VMDK (Virtual Machine Disk) - format uzywany przez VMWware
+2.3.2 Wybor, czy plik wirtualnego dysku powinien byc przydzielany dynamicznie (rosnac wraz z uzyciem), czy miec staly rozmiar (taki jaki zostal stowrzony).
+2.3.3 Lokalizacja pliku i rozmiaru dlanowego wirtualnego dysku.
+
+3. Ustawienie maszyny wirtualnej.
+
+Przechodzac do ustawien mamy dostep do wyboru opcji takich jak: system, ekran, pamiec, dzwiek, siec, porty szeregowe, usb, udostepnione foldery oraz interfejs uzytkownika. Wchodzac w zakladke 
+"pamiec" wciskamy ikonke plyty i wybieramy plik .iso z Debianem do zamontowania.
+
+4. Uruchomienie Maszyny Wirtualnej
+
+Maszyne wirtualna mozna uruchomic na kilka sposobow (Zwykly start, bezglowy start, oddzielny start). Przy zwyklym starcie po wystartowaniu maszyny nalezy wkliknac sie wewnatrz maszyny wirtualnej i szybko wcisnac klawisz "F12" zanim zniknie logo VirtualBox'a.
+
+Wybieramy sposob isntalacji (Graphical install, install, install with speech synthesis). Na 
+zajeciach wybralem opcje "Install"
+
+5. Proces instalacji.
+
+5.1 Wybor jezyka [English]
+5.2 Wybor lokalizacji [other>Europe>Poland]
+5.3 Wybor ukladu klawiatury [United States]
+5.4 Wybor keymap [American English]
+//podczas instalacji zielona kropka oznacza odczyt, a czerwona nagrywanie
+5.5 Podanie nazwy komputera, ktory instalujemy. Domyslnie jest to napis "debian". Nazwa powinna byc inna niz nazwa uzytkownika.
+5.6 Podanie hasla root (administratora systemu)
+5.7 Podanie nazwy uzytkownika (lepiej pisac z malych liter, poniewaz Linux jest czuly na wielkosc znakow)
+5.8 Podanie loginu uzytkownika
+5.9 Podanie hasla dla nowego uzytkownika
+5.10 Wybor podzialu dysku na partycje. Dostepne opcje to:
+Guided - use entire disk > prowadzony przez kreator, caly dysk zostanie przeformatowany
+Guided - use entire disk and set up LVM > robia sie partycje zarzadzane przez system LVM, czyli na dzialajacym systemie mozna dodawac/rozszerzac partycje
+Guided - use entire disk and set up encrypted LVM > jak wyzej z dodatkowym uzyciem szyfracji
+Manual > recznie
+5.11 Partycjonowanie dysku po wyborze opcji Manual
+5.11.1 pri/log 8.6GB > create ne partition > wybor rozmiaru (2GB mniej niz zadeklarowane) >
+typ partycji [Primary] > lokacja nowej partycji [Beginning] > ustawienie partycji [Ext4 journaling file system], mount point [/], bootable flag [on] i reszta zostaje defaultowo > Done setting up the partition > pri/log 2Gb (to co zostalo) > create a new partition > enter > [Primary/Logical] - kazda opcja jest ok > use as: [swap area] > done setting up the partition > Finish partitioning and write changes > [YES]
+//W tym momencie na dysku sa zapisywane zmiany (sygnalizuje to czerwona kropka przy ikonie dysku)
+5.12 Wybor skad system ma pobierac dalsze pakiety bezposrednio z internetu [Poland > ftp.task.gda.pl]
+5.13 Wybranie co chcemy zeby zostalo zaisntalowane [Debian/desktopenviroment/GNOME/XFCE/KDE Plasma/Cinnamon/Mate/LXDE/LXQt/web server/SSH server/standard system utilities)
+5.14 Boot loader. Na pcozatku dysku twardego musi znalezc sie program Boot Loader tj. program, ktory uruchomi komputer.
+
+
+Instalacja zostaje zakonczona i mozna odmontowac plik ISO lecz nie jest to koniecznet
