@@ -1,0 +1,37 @@
+BASH#2
+Zmienne:
+x="tekst"
+piec=5;
+
+echo "${$x}  ${piec}"
+
+Zmienne ktore juz sa: // SPECJALNE
+$0      - nazwa skryptu
+$1, $2  - kolejny argumenty skryptu
+$?      - kod zakonczenia ostatniego polecenia
+$@      - mozna uzyc do petli, by moc iterowac po parametrach
+$$      - PID procesu bieezacej powloki
+$#      - liczba paramterow przekazanych do skryptu
+
+CW
+
+cat $1 | sed ''s/Damian/`printf "\033[31mDamian\033[0m"`/g''
+
+
+Cudzyslowia "" uzywa sie do interpolacji ciagu znakow, pozwala to na korzystanie z zmiennych.
+Apostrof '' sluzy do pisania ciagu znakow, nie obsluguje interpolacji.
+
+echo $PATH          -"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"			
+                    -lista sciezek ktore zawieraja katalogi ktore beda przeszukiwane by znalezc i uruchomic wpisane pozniej polecenie 																										
+echo $RANDOM       -generator liczb losowych												
+echo $PWD          -"/home/ubuntu/repo/sop2020-21_24c/s11126/cw2"							
+echo $PS1          -Zawiera ona sekwencje znana jako znak zachęty									
+echo $USER         -"ubuntu"- nazwa uzytkownika										
+echo $HOSTNAME     -"bss-ubu1804" , jest to wiec zmienna systemowa przechowująca nazwe hosta					
+echo $OSTYPE       -"linux-gnu" , zmienna przechowujaca informacje jaki to jest system
+
+CW
+
+A=Ala									
+echo $A ma kota, kot ma $A | sed s/a$/ę/g | sed 's/\([^ę]\)$/\1a/g'
+
