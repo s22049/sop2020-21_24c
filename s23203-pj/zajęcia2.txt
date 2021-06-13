@@ -1,0 +1,92 @@
+Zadanie 1
+
+tworzymy plik o rozszerzeniu sh
+nadajemy uzytkownikom uprawnienia do wykonywania (chmod u+x nazwa.sh)
+w pliku wpisujemy
+				#!/bin/bash
+				echo -e "Witamy w terminalu"
+	- uruchamiamy skrypt: ./nazwa.sh
+	
+	
+
+Zadanie 2
+	X=tekst  //tworzymy zmienna X i przypisujemy do niej wartosc "tekst"
+	echo $X  //wypisujemy wartosc tej zmiennej
+	bash     //otwieramy nowego basha
+	echo $X  //wypisujemy wartosc zmiennej 	
+				
+	X=Tekst dluzszy		//przypisujemy wartosc do zmiennej
+	echo $X				//wypisujemy wartosc zmiennej na ekranie
+	
+Do zmiennej zostanie zapisane tylko slowo "Tekst"
+Zeby zadzialalo musimy uzyc "" lub ''
+	
+	X="Tekst 1"			//przypisujemy wartosc do zmiennej X
+	Y="tekst:$X"		//przypisujemy wartosc do zmiennej Y
+	echo "$Y"			//wypisujemy wartosc zmiennej Y (wypisane zostanie: "tekst:Tekst 1")
+	
+	Y='tekst:$X'
+	echo "$Y"			//wypisane zostanie "tekst:$X", uzycie ' powoduje, ze tekst w srodku nie jest rozwijany
+	
+	Y=tekst:$X
+	echo "$Y"			//wyswietlony napis bedzie taki sam jak przy uzyciu ""$
+
+	
+Zadanie 3
+
+Zmienne przechowuja:
+	PATH - lista katalogow, ktore sa przeszukiwane w poszukiwaniu plikow wykonywalnych
+	RANDOM - generator liczb losowych
+	PWD - zawiera biezaca sciezke
+	PS1 - tekst, który informuje użytkownika, że system czeka na wprowadzenie przez niego danych
+	USER - nazwa uzytkownika
+	HOSTNAME - nazwa hosta 
+	OSTYPE - przechowuje informacje o tym jaki mamy system
+
+	
+Zadanie 4
+
+	X=$(ls -l)		//tworzymy zmienna X z przypisana komenda ls
+	echo $X			//wypisuje nam wyniki jeden za drugim
+	echo "$X"		//wypisuje wyniki jeden pod drugim 
+	
+Zadanie 5
+
+Zeby poprawnie wypisac: Ala ma kota, kot ma Alę
+	
+	A=Ala										//tworzymy zmienna
+	echo $A ma kota, a kot ma ${A:0:2}ę			//${A:0:2}ę - wypisujemy dwa pierwsze znaki imienia i na koncu wypisujemy ę
+	
+	W tym przypadku zadziala tez ${A/a/ę}       //a zostanie zamienione na ę (A duze jest osobnym znakiem dlatego nie zostanie zamienione
+	
+	#!/bin/bash
+	
+	case $1 in
+	*a)
+	echo $1 ma kota, a kot ma $1 | sed s/a$/ę/g
+	;;
+	*)
+	echo $1 ma kota, a kot ma $1 | sed s/$/a/g
+	;;
+	esac
+	
+	skrypt nalezy wywolac z wartoscia zmiennej w ""
+	np. ./skrypt.sh "Przykladowy tekst SOP"
+	
+	#!/bin/bash
+	echo ${1:0:1}							//wywolanie pierwszego znaku
+	echo "S{1: -1}"							//wywolanie ostatniego znaku
+	echo -e "${1/SOP/\\e[32mSOP\\e[0m}		//jezeli w zmiennej pojawi sie SOP to zostanie pokolorowane na zielono
+	
+
+6. Zadanie 6
+
+	A=Ala										   //utworzenie zmiennej 
+	echo $A ma kota, kot ma $A | sed s/a$/ę/g      //uzycie komendy sed
+	
+Zadanie Domowe
+
+	#!/bin/bash
+	
+	cat $1 | sed ''s/Sebastian/`printf "\033[31mSebastian\033[0m"`/g''
+	echo ""
