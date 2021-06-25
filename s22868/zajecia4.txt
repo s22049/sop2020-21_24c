@@ -1,0 +1,172 @@
+Jezyk C
+
+scanf - standardowe wejscie
+printf - standarodwe wyjscie
+return x -  x = kod zakończenia programu
+int argc - ilość parametrów podanych do programu
+char** argv - tablica parametrow podanych do programu
+
+Przy używaniu zmiennych:
+
+Gwiazdka oznacza pobranie wartości wskazywanej przez dany adres (wskaźnik).
+Znak & oznacza pobranie adresu danej zmiennej Przy deklaracji zmiennych:
+Gwiazdka oznacza typ wskaźnikowy
+Można zadeklarować wskaźnik na funkcję, wtedy robi się to tak:
+typ_zwracany (*nazwa_funkcji)(typy_argumentow,...);
+
+###################################################################################
+
+Zadania 
+
+zad1
+
+#include <stdio.h>
+
+int main(){
+    int suma = 0;
+    int x;
+
+    while(scanf("%d",&x) > 0){
+        suma+=x;
+    }
+
+    printf("%d\n",suma);
+    return 0;
+}
+
+zad2
+
+#include <stdio.h>
+
+int main(){
+    int suma = 0;
+    int x;
+
+    while(scanf("%d",&x) > 0){
+        suma+=x;
+    }
+
+    return suma;
+}
+
+zad 3
+
+int main(int argc, char** argv){
+        if(argc==2){
+                int i=0;
+                int j=0;
+                int iloscWierszy=atoi(argv[1]);
+                printf("Wiersze: %d\n",iloscWierszy);
+                for(i=0;i<iloscWierszy;i++){
+                        for(j=0;j<iloscWierszy-i;j++){
+                                printf(" ");
+                        }
+                        for(j=0;j<i*2-1;j++){
+                                printf("*");
+                        }
+                        printf("\n");
+                }
+        }
+
+        return 0;
+
+}
+
+####################################################################
+
+Zadania z IO
+
+zad 1
+
+#include <stdio.h> 
+#include <stdlib.h>
+
+int main(int argc, char **argv) 
+{
+    FILE *f;
+    int i, rows, *fileData;
+    char filename[64];
+
+    if (argc == 2) {
+        f = fopen(argv[1], "r");
+    } else if (argc == 1) {
+        printf("podaj nazwe pliku\n");
+        scanf("%s", filename);
+        f = fopen(filename, "r");
+    }
+
+    if(f == NULL) {
+        printf("nie znaleziono pliku\n");
+        return 404;
+    }
+
+    fscanf(f, "%d\n", &rows);
+    fileData = (int *) malloc(rows * sizeof(rows));
+    
+    for (i = 0; i < rows; i++) {
+        int number;
+        fscanf(f, "%d\n", &number);
+        fileData[i] = number;
+    }
+
+    fclose(f);
+
+    for (i = rows-1; i >= 0; i--) {
+        printf("%d\n", fileData[i]);
+    }
+
+    return 0;
+}
+
+###############################################
+#include <stdlib.h>
+#include <stdio.h>
+
+int forAll(int *arr, int n, int (*f)(int, int)) {
+    int v = arr[0];
+    int i;
+
+    for(i=1; i<n; i++) {
+        v = f(v, arr[i]);
+    } 
+    return v;
+}
+
+int suma (int v, int n) {
+    return (v+n);
+}
+
+int maksimum (int v, int n) {
+    if(v<n) {
+        v = n;
+    }
+    return v;
+}
+
+int minimum (int v, int n) {
+    if(v>n) {
+        v = n;
+    }
+    return v;
+}
+
+
+int main(){
+        int z, n v, i, *arr;
+        int(*f[3])(int, int);
+        f[0] = suma;
+        f[1] = minimum;
+        f[2] = maksimum;
+        printf("podaj n\n");
+        scanf("%d", &n);
+        printf("podaj n liczb\n");
+        for(i=0; i<n; i++){
+                scanf("%d", &arr[i]);
+        }
+        printf("podaj cyfre 0-2")
+        scanf("%d", &z)
+        
+        printf("wynik: %d\n", forAll(arr, n, f[z]))
+        return 0
+
+}
