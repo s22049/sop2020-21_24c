@@ -1,0 +1,664 @@
+20210527 - 20210623
+-----------------
+04 Wstep do C
+-----------------
+1 ZADANIA
+
+//KOMPILOWANIE!
+//gcc -wall -ansi -pedantic -o 1_1 1_1.c
+
+
+*1. Napisz program obliczający sumę liczb wprowadzonych przez użytkownika (ze standardowego wejścia) i wypisujący wynik na standardowe wyjście. Przydatne hasła to:
+scanf
+printf
+operatory arytmetyczne
+if
+for albo while
+
+CODE:
+#include <stdio.h>
+
+
+int main(){
+    int suma=0;
+    int input=0;
+
+    while(scanf("%d\n", &input) > 0){
+        suma += input;
+    }
+    printf("%d\n", suma);
+    return 0;
+}
+
+RESULT:
+bash-5.0$ ./1_1
+4
+3
+5
+6
+7
+25
+
+*2. Przerób ten program tak, aby wartość była zwracana jako kod zakończenia programu. Wyświetl tą wartość z linii komend. Przydatne komendy:
+return
+
+CODE:
+#include <stdio.h>
+
+int main(){
+    int suma=0;
+    int input=0;
+
+    while(scanf("%d\n", &input) > 0){
+        suma += input;
+    }
+    printf("%d\n", suma);
+    return suma;
+}
+RESULT:
+bash-5.0$ ./1_2
+4
+5
+6
+7
+22
+bash-5.0$ echo $?
+22
+
+
+ATTENTION!
+$? - this command returns the return code of the last performed bash program
+
+#in Windows:
+#echo $LASTEXITCODE
+
+*3. Napisz program wyświetlający tradycyjną choinkę o zadanej wysokości. Wysokość niech będzie podana jako parametr wywołania programu. Przydatne hasła to:
+atoi
+argc, argv
+for
+
+TEST CODE:
+
+//atoi - ASCII to integer !! konwersja niezbedna by zamienic %s (char) na %d (integer)
+//argc - ilosc
+//argv - tablica tablic
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char** argv){
+    int i=0;
+    for(i=1; i<argc; i++){
+        printf("%d\n",atoi(argv[i])); //jednak musi byc %d, poniewaz robimy konwersje ASCII do integer
+    }
+    return 0;
+}
+
+TEST RESULT:
+bash-5.0$ ./1_3_testowanie_petli 5 5 6 7 8 3
+5
+5
+6
+7
+8
+3
+
+EXCERCISE'S CODE:
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char** argv){
+    if(argc==2){
+        int i;
+        int j;
+        int amountOfLines=atoi(argv[1]);
+        printf("Look it is a Christmas tree!", amountOfLines);
+        for(i=0;i<=amountOfLines; i++){
+            for(j=0;j<amountOfLines-i;j++){
+                printf(" ");
+            }
+            for(j=0;j<i*2-1;j++){
+                printf("*");
+            }
+            printf("\n");    
+        }
+    }
+    return 0;
+}
+
+EXCERCISE RESULT:
+bash-5.0$ ./1_3 20
+Look it is a Christmas tree!
+                   *
+                  ***
+                 *****
+                *******
+               *********
+              ***********
+             *************
+            ***************
+           *****************
+          *******************
+         *********************
+        ***********************
+       *************************
+      ***************************
+     *****************************
+    *******************************
+   *********************************
+  ***********************************
+ *************************************
+***************************************
+bash-5.0$ 
+
+
+ATTENTION!
+argc - amount of arguments, argument 0 is for name of program, always higher than 1!!
+argv - value of argument
+char* nameOfArray - array with one word
+char** nameOfArray - array with whole text, we have to use it always to have array of ARRAYS
+
+--------------
+2 ZADANIA z IO
+
+*IO1
+
+Komendy z rodziny *printf oraz *scanf służą do formatowanego wejścia i wyjścia - umdostępniają sporo możliwości. Przetrenujmy to.
+Napisz program wczytujący z pliku tekstowego ciąg liczb. Format pliku jest taki:
+wiersz 1. liczba elementów ciągu (jako liczba naturalna)
+wiersz 2. Kolejne liczby - każda w nowej linii
+Niech program wypisze je w odwrotnej kolejności. Program powinien przyjmować zero albo jeden argument:
+jeśli nie podano argumentu, to ma wczytywać ze standardowego wejścia
+jeśli podano argument, to jest to nazwa pliku do wczytania
+Skorzystaj z fopen, fclose, fscanf.
+Zabezpiecz przed przepełnieniem bufora.
+
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char** argv){
+    FILE *f; //Gdyby mialo tu byc otwarcie konkretnego pliku to linia: FILE *f = fopen("IO1_FILE.txt", "r");
+    int firstNumberFromFile;
+    int iter;
+    int *numbers;
+
+    //warunki jesli podano mniej niz dwa argumenty
+    if(argc<2){
+        f = stdin; //standardowe wejscie
+        
+    } else {
+        f = fopen(argv[1], "r");
+    }
+
+    //jesli pliku nie ma, komputer nawalil, cos sie stalo to:
+    if (f == NULL){ 
+        return 1;
+    }
+
+    //wczytujemy ilosc liczb
+    fscanf(f, "%d\n", &firstNumberFromFile);
+    //zeby stworzyć tablice wielkości jeszcze niewiadomej, w nawiasie ile pamieci zalokowac;
+    numbers = malloc(firstNumberFromFile*(sizeof(firstNumberFromFile)));
+
+    //teraz zczytujemy kolejno liczby do tablicy
+    for(iter=0; iter<firstNumberFromFile;iter++){
+        int a;
+        fscanf(f, "%d\n", &a);
+        numbers[iter] = a;
+        printf("db: iter: %d, firstNumbeFromFile: %d, a: %d\n", iter, firstNumberFromFile, a);
+    }
+
+    //po wczytaniu zamykamy plik
+    if (f != NULL){
+        fclose(f);
+    } 
+
+    //wypisywanie w odwrotnej kolejnosci
+    printf("Liczby w odwrotnej kolejnosci:\n");
+    for(iter = firstNumberFromFile; iter>0; --iter){
+        int a = numbers[iter-1];
+        printf("db: To jest: %d, liczba w tablicy: %d\n", iter, a); //nie wiem dlaczego, ale jak tu był "&" to byly liczby przypadkowe ujemne!
+    }   
+
+    //zwalnianie pamięci - czyszczenie bufora?
+    if(numbers != NULL){
+        free(numbers);
+    }
+    return 0;
+}
+
+RESULT:
+bash-5.0$ ./IO1 IO1_FILE.txt
+db: iter: 0, firstNumbeFromFile: 7, a: 1
+db: iter: 1, firstNumbeFromFile: 7, a: 2
+db: iter: 2, firstNumbeFromFile: 7, a: 3
+db: iter: 3, firstNumbeFromFile: 7, a: 4
+db: iter: 4, firstNumbeFromFile: 7, a: 5
+db: iter: 5, firstNumbeFromFile: 7, a: 6
+db: iter: 6, firstNumbeFromFile: 7, a: 7
+Liczby w odwrotnej kolejnosci:
+db: To jest: 7, liczba w tablicy: 7
+db: To jest: 6, liczba w tablicy: 6
+db: To jest: 5, liczba w tablicy: 5
+db: To jest: 4, liczba w tablicy: 4
+db: To jest: 3, liczba w tablicy: 3
+db: To jest: 2, liczba w tablicy: 2
+db: To jest: 1, liczba w tablicy: 1
+bash-5.0$
+
+ATTENTION!
+If you use scanf, fscanf, the argument must have &argument!
+
+*IO2
+Rozwiń program z poprzedniego zadania o zapis wczytanej tablicy do pliku binarnego. (tym razem niech nazwa tego pliku będzie ustalona wewnątrz programu)
+
+Rozwiń program tak, aby podanie argumentu:
+--print
+spowodowało wypisanie zawartości pliku binarnego.
+
+Możesz skorzystać z hexedytora hte, który jest dostępny na pracowni, aby podejrzeć zawartość wygenerowanego pliku.
+
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+int main(int argc, char** argv){
+    FILE *f; //Gdyby mialo tu byc otwarcie konkretnego pliku to linia: FILE *f = fopen("IO1_FILE.txt", "r");
+    FILE *binaryFile; //Utworzenie pliku binarnego
+    int firstNumberFromFile; //pierwsza liczba z pliku, czyli ilosc liczb
+    int iter;
+    int *numbers; //tablica do przechowywania liczb z pliku
+    bool printFlag = false; 
+    int argNumberWithFileName; //numer z tablicy argumentow wpisanych w poleceniu, przechowujacy nazwe pliku
+    char *fileName; //*powoduje ze jest traktowane od poczatku tego stringa
+    //iterowanie do sprawdzenia czy podano argument --print, moznaby bylo switchem, byloby latwiej, ale tutaj nie zadziala
+    for(iter = 0; iter < argc; iter++){
+        if(strcmp(argv[iter], "--print") == 0){
+            printFlag = true;
+        } else {
+            //fileName = *argv[iter];
+            argNumberWithFileName = iter;
+        }
+    }
+
+    if(printFlag == true) {
+        //otwieranie pliku binarnego
+        binaryFile = fopen("binaryFile.bin", "rb");
+        //otwieranie pliku f
+        f = fopen(argv[1], "r");
+        //wczytujemy ilosc liczb
+        fscanf(f, "%d\n", &firstNumberFromFile);
+        //zeby stworzyć tablice wielkości jeszcze niewiadomej, w nawiasie ile pamieci zalokowac;
+        numbers = malloc(firstNumberFromFile*(sizeof(firstNumberFromFile)));
+        //odczytywanie pliku binarnego
+        fread(numbers, sizeof(int), firstNumberFromFile, binaryFile);
+        //po wczytaniu zamykamy plik
+        fclose(binaryFile);
+        //zamykanie pliku f
+        fclose(f);
+        //petla do drukowania zawartosci pliku binarnego
+        printf("Ponizej zawartosc pliku binarnego:\n");
+        for (short i = 0; i < firstNumberFromFile; i++) {
+            printf("%d\n", numbers[i]);
+        }
+        return 0;
+    }
+
+    //warunki jesli podano mniej niz dwa argumenty
+    if(argc<2){
+        f = stdin; //standardowe wejscie
+    } else {
+        f = fopen(argv[1], "r");
+    }
+
+    //jesli pliku nie ma, komputer nawalil, cos sie stalo to:
+    if (f == NULL){ 
+        return 1;
+    }
+    
+    //wczytujemy ilosc liczb
+    fscanf(f, "%d\n", &firstNumberFromFile);
+    //zeby stworzyć tablice wielkości jeszcze niewiadomej, w nawiasie ile pamieci zalokowac;
+    numbers = malloc(firstNumberFromFile*(sizeof(firstNumberFromFile)));
+
+    //teraz zczytujemy kolejno liczby do tablicy z pliku tekstowego
+    for(iter=0; iter<firstNumberFromFile;iter++){
+        int a;
+        fscanf(f, "%d\n", &a);
+        numbers[iter] = a;
+        printf("db: iter: %d, firstNumbeFromFile: %d, a: %d\n", iter, firstNumberFromFile, a);
+    }
+
+    //po wczytaniu zamykamy plik
+    if (f != NULL){
+        fclose(f);
+    }
+
+    //otwiera plik do nadpisywania zamazujac to co bylo, wszystko w trybie binarnym
+    binaryFile = fopen("binaryFile.bin", "wb");
+
+    //zapisywanie do pliku binarnego
+    fwrite(numbers, sizeof(int), firstNumberFromFile, binaryFile);
+
+    //po wczytaniu zamykamy plik
+    fclose(binaryFile);
+    
+    //wypisywanie w odwrotnej kolejnosci
+    printf("Liczby w odwrotnej kolejnosci:\n");
+    for(iter = firstNumberFromFile; iter>0; --iter){
+        int a = numbers[iter-1];
+        printf("db: To jest: %d, liczba w tablicy: %d\n", iter, a); //nie wiem dlaczego, ale jak tu był "&" to byly liczby przypadkowe ujemne!
+    }   
+
+    //zwalnianie pamięci - czyszczenie bufora?
+    if(numbers != NULL){
+        free(numbers);
+    }
+    return 0;
+}
+
+RESULT:
+#1 without --print
+bash-5.0$ ./IO2 IO1_FILE.txt
+db: iter: 0, firstNumbeFromFile: 7, a: 1
+db: iter: 1, firstNumbeFromFile: 7, a: 2
+db: iter: 2, firstNumbeFromFile: 7, a: 3
+db: iter: 3, firstNumbeFromFile: 7, a: 4
+db: iter: 4, firstNumbeFromFile: 7, a: 5
+db: iter: 5, firstNumbeFromFile: 7, a: 6
+db: iter: 6, firstNumbeFromFile: 7, a: 7
+Liczby w odwrotnej kolejnosci:
+db: To jest: 7, liczba w tablicy: 7
+db: To jest: 6, liczba w tablicy: 6
+db: To jest: 5, liczba w tablicy: 5
+db: To jest: 4, liczba w tablicy: 4
+db: To jest: 3, liczba w tablicy: 3
+db: To jest: 2, liczba w tablicy: 2
+db: To jest: 1, liczba w tablicy: 1
+bash-5.0$
+
+#2 with --print
+bash-5.0$ ./IO2 IO1_FILE.txt --print
+Ponizej zawartosc pliku binarnego:
+1
+2
+3
+4
+5
+6
+7
+bash-5.0$
+
+*IO3
+Rozwiń poprzednie zadanie o obsługę dowolnie wielkich tablic. Skorzystaj z malloc oraz free.
+
+It was done.
+
+To remember:
+CREATING:
+int *array;
+array = malloc(amountOfElementsInArray*(sizeof(amountOfElementsInArray)));
+
+FREEING THE BUFFER:
+if(array != NULL){
+	free(array);
+}
+
+--------------
+O WSKAZNIKACH
+
+Przy używaniu zmiennych:
+
+Gwiazdka oznacza pobranie wartości wskazywanej przez dany adres (wskaźnik).
+Znak & oznacza pobranie adresu danej zmiennej Przy deklaracji zmiennych:
+Gwiazdka oznacza typ wskaźnikowy
+Można zadeklarować wskaźnik na funkcję, wtedy robi się to tak:
+typ_zwracany (*nazwa_funkcji)(typy_argumentow,...);
+int z = 12;
+int *y;
+int **x;
+
+y = &z;
+x = &y;
+// **x == 12; *y == 12; Nie wiadomo przed uruchomieniem jaka będzie wartość x oraz y. Dlaczego?
+
+*ZADANIA A
+Napisz program z 3 funkcjami, każda funkcja niech będzie miała taką sygnaturkę:
+int (*f)(int,int) Niech będą to funkcje: maksimum, minimum oraz suma.
+	1. Zapamiętaj wskaźniki do tych funkcji w tablicy trójelementowej
+	2. Niech program pobiera kolejno wartości:
+	3. liczba z od 0 do 2 oznaczająca indeks funkcji w tablicy
+	4. liczba elementów ciągu do pobrania (nazwijmy ją n)
+	5. kolejno n liczb
+	6. Niech program przetwarza wczytaną tablicę w taki sposób, że:
+		1.Niech v przyjmie wartość pierwszego elementu
+		2.w pętli po wszystkich elementach od drugiego (indeks 1 w tablicy)
+		o.wykona funkcję o numerze z przekazując jako argumenty v oraz element o aktualnym indeksie. Niech wynik zostanie zapisany do v
+		3.Wypisze wartość v
+Czyli piszemy program który pozwoli na wykonanie albo sumy, albo znalezienia maksimum, albo znalezienia minimum z n liczb. Program nie będzie korzystał z instrukcji warunkowych (w pętli głównej) do wyboru jaka funkcja ma być wykonana.
+
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+
+int min(int a,int b);
+int max(int a,int b);
+int sum(int a,int b);
+
+int main(){
+    int z;
+    int v;
+    int n;
+    int i;
+    int *numbers;
+    numbers = malloc(n * sizeof(n));
+    int a;
+
+    //pobieranie danych od uzytkownika
+    printf("Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: ");
+    scanf("%i", &z);
+    printf("Podaj jak długi ciąg liczb przekazesz: ");
+    scanf("%i", &n);
+    
+    //zapisywanie do tablicy numbers
+    for(i=0; i<n; i++){
+        scanf("%d", &a);
+        numbers[i] = a;
+    }
+
+    //tablica wskaznikow do funkcji to f[3], ponizej deklaracja wskaznika do funkcji
+    int (*f[3])(int,int);
+    f[0] = &min;
+    f[1] = &max;
+    f[2] = &sum;
+    
+    //petla, ktora ma w ciele wybrana opcje przez uzytkownika oraz wylicza wartosc v
+    v=numbers[0];
+    for(i=1; i<n; i++){
+        v = (*f[z])(v, numbers[i]);
+    }
+
+    //zwalnianie pamięci - czyszczenie bufora?
+    if(numbers != NULL){
+        free(numbers);
+    }
+
+    //wypisanie wartosci v na ekran
+    printf("v = %i\n", v);
+    return v;
+}
+int min(int a,int b){
+    if(a>b){
+        return b;
+    } else {
+        return a;
+    }
+}
+int max(int a,int b){
+    if(a>b){
+        return a;
+    } else {
+        return b;
+    }
+}
+int sum(int a,int b){
+    int su = a+b;
+    return su;
+}
+
+RESULTS:
+#1
+bash-5.0$ ./POINTERS_1
+Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: 0
+Podaj jak długi ciąg liczb przekazesz: 4
+1
+6
+3
+8
+v = 1
+bash-5.0$
+
+#2
+bash-5.0$ ./POINTERS_1
+Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: 0
+Podaj jak długi ciąg liczb przekazesz: 4
+7
+5
+1
+4
+v = 1
+bash-5.0$
+
+#3
+bash-5.0$ ./POINTERS_1
+Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: 1
+Podaj jak długi ciąg liczb przekazesz: 4
+7
+5
+1
+4
+v = 7
+bash-5.0$
+
+#4
+bash-5.0$ ./POINTERS_1
+Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: 2
+Podaj jak długi ciąg liczb przekazesz: 4
+7
+5
+1
+4
+v = 17
+bash-5.0$
+
+bash-5.0$ ./POINTERS_1
+Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: 2
+Podaj jak długi ciąg liczb przekazesz: 4
+7
+5
+1
+4
+v = 17
+bash-5.0$bash-5.0$ ./POINTERS_1
+Podaj ktory tryb programu wybierasz: 0 - wartosc minimalna, 1 - wartosc maxymalna, 2 - suma: 2
+Podaj jak długi ciąg liczb przekazesz: 4
+7
+5
+1
+4
+v = 17
+bash-5.0$
+
+*ZADANIA B
+Korzystając z wiedzy z poprzedniego zadania, napisz funkcję, która będzie przetwarzała tablicę za pomocą uniwersalnej funkcji podanej jako argument funkcji. Na przykład:
+
+int wynik = forAll(tablica, liczbaElementow, maksimum); // maksimum to nazwa funkcji porownujacej dwie wartosci
+
+CODE:
+#include <stdio.h>
+#include <stdlib.h>
+
+int min(int a,int b);
+int max(int a,int b);
+int sum(int a,int b);
+
+int forAll(int tab[], int n, int (*f)(int, int));
+
+int main(){
+    int n=0;
+    int i;
+    int *numbers;
+    numbers = malloc(n * sizeof(n));
+    int a;
+
+    //pobieranie danych od uzytkownika
+    printf("Podaj jak długi ciąg liczb przekazesz: ");
+    scanf("%i", &n);
+    
+    //zapisywanie do tablicy numbers
+    for(i=0; i<n; i++){
+        scanf("%d", &a);
+        numbers[i] = a;
+    }
+
+    //uzycie funkcji forAll
+    int wynikMax = forAll(numbers, n, *max);
+    int wynikMin = forAll(numbers, n, *min);
+    int wynikSum = forAll(numbers, n, *sum);
+
+    //zwalnianie pamięci - czyszczenie bufora?
+    if(numbers != NULL){
+        free(numbers);
+    }
+
+    //wypisanie wartosci v na ekran
+    printf("wynik forAll max = %i\nwynik forAll min = %i\nwynik forAll suma = %i\n", wynikMax, wynikMin, wynikSum);
+    return 0;
+}
+int min(int a,int b){
+    if(a>b){
+        return b;
+    } else {
+        return a;
+    }
+}
+int max(int a,int b){
+    if(a>b){
+        return a;
+    } else {
+        return b;
+    }
+}
+int sum(int a,int b){
+    int su = a+b;
+    return su;
+}
+int forAll(int tab[], int n, int (*f)(int, int)){
+    int v, i;
+    v=tab[0];
+    for(i=1; i<n; i++){
+        v = (f)(v, tab[i]);
+    }
+    return v;
+}
+
+WARNING!!!
+//if we pass array to the function as an argument we cant pass it as a pointer example int *tab[]
+//it WON'T WORK PROPERLY!!!
+
+RESULT:
+bash-5.0$ ./POINTERS_2
+Podaj jak długi ciąg liczb przekazesz: 5
+3
+3
+1
+1
+2
+wynik forAll max = 3
+wynik forAll min = 1
+wynik forAll suma = 10
+bash-5.0$
+
