@@ -1,0 +1,67 @@
+1.zad
+
+#!/usr/bin/env bash
+
+if [ $# -gt 1 ]
+then
+    echo $1;
+else
+    echo "Nie podano parametrow."
+fi 
+
+2.zad
+
+#!/usr/bin/env bash
+
+#wypisuje od 1 do 10 co dwie
+for i in {10..1..2}; do
+    echo $i;
+done
+
+3.zad
+
+#!/bin/bash                                                                   
+
+FILENAME=$(basename $0)
+NAME="${FILENAME%.*}"
+EXT="${FILENAME##*.}"
+
+if [[ $EXT != "sh" ]]; then
+        mv $0 ${0}.sh
+fi
+
+4.zad
+
+#!/bin/bash                                             
+                                                        
+if [ $(ls -l |grep -e "^-" |wc -l ) -gt 5 ; then        
+        echo "Jest wiecej niz 5 plików w katalogu"      
+fi   
+
+5.zad
+
+#!/bin/bash				
+					
+files=$(ls -1)				
+					
+for f in $files; do			
+        NAME="${f%.*}"			
+        EXT="${f##*.}"			
+					
+        if [[ ${EXT} == "c" ]]; then	
+                cc $f -o $NAME		
+        fi				
+					
+done
+
+6.fibonacci
+
+!/bin/bash							
+								
+fibonacci () {i							
+								
+case $1 in							
+       0|1) echo $1 ;;						
+       *) echo $((`fibonacci $[$1-1]` + `fibonacci $[$1-2]`)) ;;
+esac								
+}
