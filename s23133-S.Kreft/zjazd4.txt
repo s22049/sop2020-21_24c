@@ -1,0 +1,517 @@
+2021.04.25 Zjazd 4:
+
+Wskaźniki:
+
+-Gwiazdka oznacza pobranie wartości wskazywanej przez dany adres (wskaźnik).
+-Znak & oznacza pobranie adresu danej zmiennej Przy deklaracji zmiennych:
+-Gwiazdka oznacza typ wskaźnikowy
+-Można zadeklarować wskaźnik na funkcję: typ_zwracany (*nazwa_funkcji)(typy_argumentow,...);
+
+
+Skrypt 1 + 2:
+
+Napisz program obliczający sume liczb wprowadzonych przez użytkownika (ze standardowego wejścia) i wypisujący wynik na standardowe wyjście. Przydatne hasła to:
+ scanf; printf; operatory arytmetyczne; if; for albo while 
+ + Przerób ten program tak, aby wartość była zwracana jako kod zakończenia programu.
+
+#include<stdio.h>
+
+int main()
+{
+int suma = 0;
+int input = 0;
+
+while(scanf("%d\n", &input) > 0)
+{
+    suma += input;
+}
+
+printf ("%d\n", suma);
+return suma;
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Skrypt 2:
+
+Napisz program wyświetlający tradycyjną choinkę o zadanej wysokości. Wysokość niech będzie podana jako parametr wywołania programu.
+
+#include<stdio.h>
+#include<stdlib.h>
+
+int main(int argc, char** argv)
+{
+    if(argc==2)
+    {
+        int i = 0;
+        int j = 0;
+        int iloscWierszy=atoi(argv[1]);
+        printf("Wiersze: %d\n", iloscWierszy);
+        for(i=0; i<iloscWierszy; i++)
+        {
+            for(j=0; j<iloscWierszy - i; j++)
+            {
+                printf(" ");
+            }
+            for(j=0; j<i*2 - 1; j++)
+            {
+                printf("*");
+            }
+            printf("\n");
+        }
+        
+    }
+    return 0;
+}
+
+-----------------------------------------------------------------------------------------------------------
+ZADANIA Z IO
+
+Zadanie1:
+Napisz program wczytujący z pliku tekstowego ciąg liczb. Format pliku jest taki:
+
+    -liczba elementów ciągu (jako liczba naturalna)
+    -Kolejne liczby - każda w nowej linii
+
+Niech program wypisze je w odwrotnej kolejności. Program powinien przyjmować zero albo jeden argument:
+
+    -jeśli nie podano argumentu, to ma wczytywać ze standardowego wejścia
+    -jeśli podano argument, to jest to nazwa pliku do wczytania
+
+
+#include<stdio.h>
+#include<stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    FILE *f;
+    int linesCounter;
+    int j;
+    int loop = 0;
+    int *liczby;
+
+
+    if (argc > 1)
+    {
+        f = fopen(argv[1], "r");
+
+        fscanf(f, "%d\n", &linesCounter);
+        liczby = malloc(linesCounter * sizeof(linesCounter));
+   
+        for (loop = 0; loop < linesCounter; loop++)
+        {
+            int a;
+            fscanf(f, "%d\n", &a);
+            liczby[loop] = a;
+        }
+        if (f != NULL)
+        {
+            fclose(f);
+        }
+        for (loop = linesCounter;loop > 0; --loop)
+        {
+            int a = liczby[loop - 1];
+            printf("%d\n", a);
+        }
+        if (liczby != NULL)
+        {
+            free(liczby);
+        }
+    }
+    else
+    {   int b;
+        j = -1;
+        scanf("%d", &linesCounter);
+
+        liczby = malloc(linesCounter * sizeof(linesCounter));
+        do
+        {   
+            j++;
+            liczby[j] = b;
+        } while(scanf("%d", &b) > 0);
+
+        for (loop = j;loop > 0; loop--)
+        {
+            int a = liczby[loop];
+            printf("%d\n", a);
+        }
+        if (liczby != NULL)
+        {
+            free(liczby);
+        }
+    }
+    
+    return 0;
+}
+---------------------------------------------------------------------------------------------------------------------------------------------
+Zadanie2:
+Rozwiń program z poprzedniego zadania o zapis wczytanej tablicy do pliku binarnego. (tym razem niech nazwa tego pliku będzie ustalona wewnątrz programu)
+
+#include<stdio.h>
+#include<stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    FILE *f;
+    int linesCounter;
+    int j;
+    int loop = 0;
+    int *liczby;
+    int i = 0;
+
+
+    if (argc > 1)
+    {
+        f = fopen(argv[1], "r");
+
+        fscanf(f, "%d\n", &linesCounter);
+        liczby = malloc(linesCounter * sizeof(linesCounter));
+   
+        for (loop = 0; loop < linesCounter; loop++)
+        {
+            int a;
+            fscanf(f, "%d\n", &a);
+            liczby[loop] = a;
+        }
+        if (f != NULL)
+        {
+            fclose(f);
+        }
+        for (loop = linesCounter;loop > 0; --loop)
+        {
+            int a = liczby[loop - 1];
+            printf("%d\n", a);
+        }
+        
+    }
+    else
+    {   int b;
+        j = -1;
+        scanf("%d", &linesCounter);
+
+        liczby = malloc(linesCounter * sizeof(linesCounter));
+        do
+        {   
+            j++;
+            liczby[j] = b;
+        } while(scanf("%d", &b) > 0);
+
+        for (loop = j;loop > 0; loop--)
+        {
+            int a = liczby[loop];
+            printf("%d\n", a);
+        }
+        
+    }
+    FILE *binarny;
+
+    binarny = fopen("plik.bin", "wb");
+    fwrite(liczby, sizeof(liczby), 1, binarny);
+
+    fclose(binarny);
+    if (liczby != NULL)
+    {
+        free(liczby);
+    }
+    return 0;
+}
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Zadanie 3
+Rozwiń poprzednie zadanie o obsługę dowolnie wielkich tablic. Skorzystaj z malloc oraz free.
+
+#include<stdio.h>
+#include<stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    FILE *f;
+    int linesCounter;
+    int j;
+    int loop = 0;
+    int *liczby;
+
+
+    if (argc > 1)
+    {
+        f = fopen(argv[1], "r");
+
+        fscanf(f, "%d\n", &linesCounter);
+        liczby = malloc(linesCounter * sizeof(linesCounter));
+   
+        for (loop = 0; loop < linesCounter; loop++)
+        {
+            int a;
+            fscanf(f, "%d\n", &a);
+            liczby[loop] = a;
+        }
+        if (f != NULL)
+        {
+            fclose(f);
+        }
+        for (loop = linesCounter;loop > 0; --loop)
+        {
+            int a = liczby[loop - 1];
+            printf("%d\n", a);
+        }
+        if (liczby != NULL)
+        {
+            free(liczby);
+        }
+    }
+    else
+    {   int b;
+        j = -1;
+        scanf("%d", &linesCounter);
+
+        liczby = malloc(linesCounter * sizeof(linesCounter));
+        do
+        {   
+            j++;
+            liczby[j] = b;
+        } while(scanf("%d", &b) > 0);
+
+        for (loop = j;loop > 0; loop--)
+        {
+            int a = liczby[loop];
+            printf("%d\n", a);
+        }
+        if (liczby != NULL)
+        {
+            free(liczby);
+        }
+    }
+    
+    return 0;
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ZADANIA
+
+    Napisz program z 3 funkcjami, każda funkcja niech będzie miała taką sygnaturkę:
+
+    int (*f)(int,int) Niech będą to funkcje: maksimum, minimum oraz suma.
+
+    Zapamiętaj wskaźniki do tych funkcji w tablicy trójelementowej
+    Niech program pobiera kolejno wartości:
+    liczba z
+
+od 0 do 2 oznaczająca indeks funkcji w tablicy
+liczba elementów ciągu do pobrania (nazwijmy ją n
+)
+kolejno n
+liczb
+Niech program przetwarza wczytaną tablicę w taki sposób, że:
+
+   1. Niech v
+
+   2. przyjmie wartość pierwszego elementu
+	  w pętli po wszystkich elementach od drugiego (indeks 1 w tablicy)
+
+   3. wykona funkcję o numerze z
+
+		przekazując jako argumenty v oraz element o aktualnym indeksie. Niech wynik zostanie zapisany do v
+
+   4. Wypisze wartość v
+
+
+
+#include <stdio.h>
+
+
+int maksimum(int a, int b);
+int minimum(int a, int b);
+int suma(int a, int b);
+
+int main()
+{
+    int z = 0;
+    int n = 0;
+    int (*f)(int a, int b);
+    int *tab[] = {&maksimum, &minimum, &suma};
+    int *wartosci;
+    int v = 0;
+    int i = 0;
+
+    printf("Podaj operacje\n");
+    scanf("%d", &z);
+    printf("Podaj dlugosc ciagu: \n");
+    scanf("%d", &n);
+    printf("Podaj wartosci ciagu: \n");
+
+    wartosci = malloc(n * sizeof(n));
+    for(i = 0; i < n; i++)
+    {
+        scanf("%d", &wartosci[i]);
+    }
+    v = wartosci[0];
+    f = tab[z];
+    
+    for(i = 1; i < n; i++)
+    {
+        v = (*f)(v, wartosci[i]);
+    }
+
+    printf("Wartosc v: %d ", v);
+    return 0;
+}
+
+int maksimum(int a, int b)
+{
+    if(a > b)
+    {
+        return a;
+    }
+    return b;
+}
+int minimum(int a, int b)
+{
+    if(a < b)
+    {
+        return a;
+    }
+    return b;
+}
+int suma(int a, int b)
+{
+    return a + b;
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Korzystając z wiedzy z poprzedniego zadania, napisz funkcję, która będzie przetwarzała tablicę za pomocą uniwersalnej funkcji podanej jako argument funkcji.
+
+#include <stdio.h>
+
+
+int maksimum(int a, int b);
+int minimum(int a, int b);
+int suma(int a, int b);
+int forAll(int *tablica, int liczbaElementow, int (*funkcja)(int, int));
+
+int main()
+{
+    int z = 0;
+    int n = 0;
+    int (*f)(int a, int b);
+    int *tab[] = {&maksimum, &minimum, &suma};
+    int *wartosci;
+    int v = 0;
+    int i = 0;
+
+    printf("Podaj operacje\n");
+    scanf("%d", &z);
+    printf("Podaj dlugosc ciagu: \n");
+    scanf("%d", &n);
+    printf("Podaj wartosci ciagu: \n");
+
+    wartosci = malloc(n * sizeof(n));
+    for(i = 0; i < n; i++)
+    {
+        scanf("%d", &wartosci[i]);
+    }
+   
+    f = tab[z];
+    
+    v = forAll(wartosci, n, &maksimum);
+
+    printf("Wartosc v: %d ", v);
+    return 0;
+}
+
+int maksimum(int a, int b)
+{
+    if(a > b)
+    {
+        return a;
+    }
+    return b;
+}
+int minimum(int a, int b)
+{
+    if(a < b)
+    {
+        return a;
+    }
+    return b;
+}
+int suma(int a, int b)
+{
+    return a + b;
+}
+
+int forAll(int *tablica, int liczbaElementow, int (*funkcja)(int, int))
+{   
+    int v = tablica[0];
+    int i = 0;
+
+    for(i = 1; i < liczbaElementow; i++)
+    {
+        v = (*funkcja)(v, tablica[i]);
+    }
+    return v;
+}
+-------------------------------------------------------------------------------------------------------------------------------------
+PD.
+3.
+Napisz program liczący kolejne wartości ciągu Fibonacciego w wersji:
+
+    rekursywnej (rekurencyjnej)
+    iteracyjnej
+
+#include <stdio.h>
+
+int rekursja(int n);
+
+
+int main()
+{
+    int n = 0;
+    int i = 0;
+    int liczba = 0;
+    int fib = 0;
+    int fib1 = 0;
+    int fib2 = 1;
+    printf("Wybierz 1 zeby uzyc rekurencji, lub 2 zeby uzyc iteracji\n");
+    scanf("%d", &liczba);
+    printf("Podaj liczbe ciagu: \n");
+    scanf("%d", &n);
+    if (liczba == 1)
+    {
+        printf("%d\n", rekursja(n));
+    }
+    else if (liczba == 2)
+    {
+        if (n == 0)
+            {
+                return 0;
+            }
+            else if (n <= 2)
+            {
+                return 1;
+            }
+            else
+            {
+                 for (i = 1; i < n; i++)
+                 {
+                     fib = fib1;
+                     fib1 = fib2;
+                     fib2 = fib + fib1;
+                 }
+                 printf("%d\n", fib2);
+            }
+        
+    }
+   
+    return 0;
+}
+
+int rekursja(int n)
+{
+    if (n == 0)
+    {
+        return 0;
+    }
+    else if (n <= 2)
+    {
+        return 1;
+    }
+    else
+    {
+        return rekursja(n-1) + rekursja(n-2);
+    }
+}
