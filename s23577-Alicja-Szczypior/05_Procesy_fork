@@ -1,0 +1,383 @@
+20210623
+------------------
+Procesy - fork
+------------------
+fork
+wait
+getpid
+getppid
+zobacz też
+
+ps auxf
+
+!each process has its own PID
+!each process has its own PPID (Parent Process ID), without init process -PID=0
+!if procrss A creates process B, A will be a Parent of process B and process B can check that its PPID=PID_A
+!Parent process should wait to end its all child processes, before end Parent process
+!If Parent will be gone, or crush, generally: if process doesnt have parent -> this child is zombie process, life zombie is short, the kernel of system looks for zombie and kills it!!! LETS TRY TO NOT MAKE ZOMBIE PROCESSES!!!
+!PARENT RETURNS CHILD PID; CHILD RETURNS 0, IF 0 CHILD KNOWS THAT IT IS CHILD
+
+FROM LECTURE 5:
+#include <stdio.h>
+#include <unistd.h>
+
+int main(){
+
+    int f=fork();
+    int p=getpid();
+    int pp=getppid();
+
+    printf("1 PID: %d; PPID %d; FORK RESULT %d\n", p, pp, f);
+    printf("2 PID: %d; PPID %d; FORK RESULT %d\n", getpid(), getppid(), fork());
+    return 0;
+}
+
+//RESULT
+/**
+ * 1 PID: 891; PPID 835; FORK RESULT 892
+ * 1 PID: 892; PPID 891; FORK RESULT 0
+ * 2 PID: 891; PPID 835; FORK RESULT 893
+ * 2 PID: 892; PPID 891; FORK RESULT 894
+ * 2 PID: 891; PPID 835; FORK RESULT 0
+ * 2 PID: 892; PPID 891; FORK RESULT 0
+*/
+
+DRAW:
+       835
+        |
+        v
+       891
+      fork
+        |
+        V
+-----------------
+|               |
+V               V
+891             892(0)
+fork            fork
+|               |
+|------         |------
+|     |         |     |
+V     V         V     V
+891   893(0)    892   894(0)
+
+SO: we have now 4 processes!
+
+
+ZADANIA
+*1. Napisz program, który przedstawi swój numer PID, oraz PPID.
+
+CODE:
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    printf("PID: %d\tPPID: %d\n", getpid(), getppid());
+    return 0;
+}
+
+RESULT:
+bash-5.0$ ./zadanie1
+PID: 1115	PPID: 835
+bash-5.0$
+
+*2. Niech program z poprzedniego zadania będzie dodatkowo, po wypisaniu, czekał na standardowym wejściu na dane od użytkownika.
+
+CODE:
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    char *input;
+
+    printf("PID: %d\tPPID: %d\n", getpid(), getppid());
+    scanf("%s", &input);
+    return 0;
+}
+
+RESULT:
+bash-5.0$ ./zadanie2
+PID: 1227	PPID: 835
+suma
+bash-5.0$
+
+WARNING!!!
+char[200] input; -doesnt work :<
+
+*3. Uruchom program z poprzedniego zadania - nic nie podawaj na wejściu (program powinien czekać w nieskończoność). Za pomocą komendy kill zamknij ten proces korzystając z PID wypisanego przez niego.
+
+RESULT:
+#NEW WINDOW, LIST OF PROCESSESS
+bash-5.0$ ps
+  PID TTY           TIME CMD
+ 1240 ttys000    0:00.03 -zsh
+ 1243 ttys000    0:00.02 bash
+  492 ttys004    0:00.09 -zsh
+  835 ttys004    0:00.08 bash
+ 1238 ttys004    0:00.00 ./zadanie2
+  498 ttys005    0:00.09 -zsh
+  906 ttys005    0:00.02 bash
+ 1118 ttys005    0:00.40 vim 05_Procesy_fork
+bash-5.0$ kill 1238
+bash-5.0$
+
+#2 TYPING KILL PID
+bash-5.0$ kill 1238
+bash-5.0$
+
+#3 PREVIOUS WINDOW
+bash-5.0$ ./zadanie2
+PID: 1238	PPID: 835
+Terminated: 15
+bash-5.0$
+
+#4 BEFORE KILL PID
+bash-5.0$ ./zadanie2
+PID: 1230	PPID: 835
+
+
+*4. Napisz program, który uruchomi podproces za pomocą komendy fork. Niech proces rodzica oczekuje na proces potomka. Oba procesy powinny wypisać swój PID oraz PPID.
+
+pid_t - it is constant variable
+#include <sys/types.h> -> TO USE pid_t
+#include <sys/wait.h> -> TO USE waitpid(0, ..., 0)
+
+CODE:
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    int input;
+
+    printf("PID: %d\vPPID: %d\n", getpid(), getppid());
+
+    pid_t pid = fork();
+
+    if(pid>0){
+        //rodzic
+        printf("in PARENT:\vPID: %d\vPPID: %d\n", getpid(), getppid());
+        waitpid(0, &input, 0); //0, because we are waiting for all our children, variable in the middle must be int and must be "&"
+        printf("Rodzic zakonczyl czekac na swoje dziecko.\n");
+    } else if(pid ==0){
+        //dziecko
+        printf("in CHILD:\vPID: %d\vPPID: %d\n", getpid(), getppid());
+    } else {
+        //dziecka nie udalo sie utworzyc //jesli switchem to -1
+        printf("Nie udalo sie utworzyc dziecka.\n");
+    }
+    return 0;
+}
+
+RESULT:
+bash-5.0$ ./zadanie4
+PID: 1315
+         PPID: 835
+in PARENT:
+          PID: 1315
+                   PPID: 835
+in CHILD:
+         PID: 1316
+                  PPID: 1315
+Rodzic zakonczyl czekac na swoje dziecko.
+bash-5.0$
+
+*5. Napisz program, który będzie obliczał w 2 procesach:
+#Proces rodzica: Wartość sumy liczb od 0 do wartości zadanej jako pierwszy argument wykonania programu.
+#Proces potomny: Wypisujący liczby nieparzyste od 1 do wartości zadanej jako pierwszy argument wykonania programu. Program powinien wypisać wyniki w kolejności takiej, że najpierw wypisze wynik proces potomny, a następnie proces rodzica. Nie korzystaj z komendy sleep.
+
+CODE:
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdlib.h> -> in this is exit_success or exit_failure -> a constance variable
+
+int main(int argc, char** argv){
+    int input;
+    int liczba = atoi(argv[1]);
+    pid_t pid = fork();
+    if(pid > 0){
+        int suma=0;
+        int i;
+        for(i=0; i<=liczba; i++){
+            suma +=i;
+        }
+        waitpid(0, &input, 0);
+        printf("\nSuma z rodzica: %d\n", suma);
+    } else if(pid == 0){
+        int i=0;
+        for(i=1;i<=liczba;i=i+2){
+            printf("Dziecko, kolejne liczby niepatrzyste od 1: %d\n", i);
+        }
+    }else{
+        printf("nie udało się utworzyc dziecka.\n");
+    }
+    return 0;
+}
+
+RESULT:
+bash-5.0$ ./zadanie5 7
+Dziecko, kolejne liczby niepatrzyste od 1: 1
+Dziecko, kolejne liczby niepatrzyste od 1: 3
+Dziecko, kolejne liczby niepatrzyste od 1: 5
+Dziecko, kolejne liczby niepatrzyste od 1: 7
+
+Suma z rodzica: 28
+bash-5.0$
+
+*6. Napisz program, który uruchomi 100 procesów w taki sposób, że każdy kolejny potomek stworzy potomka. Niech każdy proces poczeka na zakończenie procesu potomka. Możesz korzystać z oczekiwania na wejście lub z komendy sleep i zobacz czy drzewko procesów jest takie jak się spodziewasz (możesz w tym celu ograniczyć liczbę procesów do 10). Zobacz podpowiedź na początku tej strony.
+
+CODE:
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main(){
+    int i;
+    for(i=0;i<10;i++){
+        pid_t pid = fork();
+        if(pid>0){
+            wait(NULL); /*funkcja czekajaca na kazde dziecko*/
+            break; /*chcemy zeby parent stworzyl dziecko tylko raz*/
+        } else { /*tutaj jak pid jest rowne zero, czyli dziecko utworzone wyzej wchodzi do else i wypisuje ponizszy tekst*/
+            printf("Number of process: %d\tPID: %d\tPPID: %d\n", i, getpid(), getppid());
+        }
+    }
+    return 0;
+}
+/**
+ * wyjasnienie:
+ * proces fork tworzy dziecko D i ma rownorzednie rodzica R
+ * R ma pid>0 wiec wchodzi do if i czeka na D, break powoduje ze nie tworzy wiecej dzieci
+ * za to D wchodzi do else i wypisuje tekst na ekran oraz wraca do petli z nastepna iteracja
+ * teraz to D jest nowym rodzicem i powtarza sie to w kolko :)
+ */
+
+IF WE PUT IN LOOP i<100 it will still WORK!
+
+RESULT:
+bash-5.0$ ./zadanie6
+Number of process: 0	PID: 1509	PPID: 1508
+Number of process: 1	PID: 1510	PPID: 1509
+Number of process: 2	PID: 1511	PPID: 1510
+Number of process: 3	PID: 1512	PPID: 1511
+Number of process: 4	PID: 1513	PPID: 1512
+Number of process: 5	PID: 1514	PPID: 1513
+Number of process: 6	PID: 1515	PPID: 1514
+Number of process: 7	PID: 1516	PPID: 1515
+Number of process: 8	PID: 1517	PPID: 1516
+Number of process: 9	PID: 1518	PPID: 1517
+bash-5.0$
+
+*7.Napisz program, który uruchomi 100 procesów potomnych w taki sposób, że będzie jeden rodzic i 100 potomków. Proces główny niech oczekuje na zakończenie wszystkich procesów potomnych.
+
+CODE:
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+
+int main(){
+    int i;
+    pid_t masterpid = getpid();
+    printf("Masterpid (PID OF PARENT): %d\n", masterpid);
+    for(i=0;i<10;i++){
+        if(fork()==0){ /*czyli zawsze jak bedzie dzieckiem ma robic fork*/
+            printf("Number of process: %d\tPID: %d\tPPID: %d\n", i, getpid(), getppid());
+            break;
+        }
+    }
+    for(i=0;i<10;i++){ //petla poczeka 10 razy
+        wait(NULL);
+    }
+   
+    return 0;
+    
+    /*dwie linijki sa na koncu pod napisem, bo jest bufor, 
+    dlatego nalezy zastosowac flush-wypisywanie tresci bufora na ekran,
+    ale niestety w wielu procesach to nie dziala dalej, trzeba pokombinowac
+    niestety w wersji z zajec ciagle mialam na koncu PPID=1 :<
+    PS: JAK BYLO 100 tez zadzialalo */
+}
+
+RESULT:
+bash-5.0$ ./zadanie7
+Masterpid (PID OF PARENT): 2070
+Number of process: 0	PID: 2071	PPID: 2070
+Number of process: 1	PID: 2072	PPID: 2070
+Number of process: 2	PID: 2073	PPID: 2070
+Number of process: 3	PID: 2074	PPID: 2070
+Number of process: 4	PID: 2075	PPID: 2070
+Number of process: 5	PID: 2076	PPID: 2070
+Number of process: 6	PID: 2077	PPID: 2070
+Number of process: 7	PID: 2078	PPID: 2070
+Number of process: 8	PID: 2079	PPID: 2070
+Number of process: 9	PID: 2080	PPID: 2070
+bash-5.0$
+
+*8. Napisz prosty program chat-u, który będzie korzystał z pliku w katalogu /tmp do przekazywania wiadomości. Zastanów się jak to zrobić. Zachęcam zapytać prowadzącego o podpowiedzi.
+
+we need too use:
+log (plik do zakladania logow)
+sekcja krytyczna
+
+*ZADANIE DOMOWE
+Napisz program, który wygeneruje drzewko procesów wyglądające tak (oczywiście procesy nie będą się nazywały A, B, ...):
+A \
+  |\B \
+  |   |\D
+  |    \E
+   \C \
+      |\F
+       \G
+A jest rodzicem 2 procesów - B oraz C, a te są odpowiednio rodzicami D i E, oraz F i G.
+
+CODE:
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main(){
+    int i, j;
+    pid_t masterpid = getpid();
+    printf("Masterpid (PID OF PARENT): %d\n", masterpid);
+    for(i=0;i<2;i++){
+        if(fork()==0){ /*czyli zawsze jak bedzie dzieckiem ma robic fork*/
+            printf("Number of process in i: %d\tPID: %d\tPPID: %d\n", i, getpid(), getppid());
+            for(j=0; j<2; j++){
+                if(fork()==0){
+                    printf("Number of process in j: %d\tPID: %d\tPPID: %d\n", j, getpid(), getppid());
+                    break;
+                }
+            }
+            for(j=0;j<2;j++){/*petla dla j poczeka 2 czyli 4 razy*/
+                wait(NULL);
+            }
+            break;
+        }
+    }
+    for(i=0;i<2;i++){ /*petla dla i poczeka 2 razy*/
+        wait(NULL);
+    }
+    return 0;
+}
+/*
+ * petla i tworzy glowne dzieci, natomiast petla j dla kazdego dziecka kolejna dwojke dzieci
+ */
+
+RESULT:
+bash-5.0$ ./zadanie_domowe
+Masterpid (PID OF PARENT): 3108
+Number of process in i: 0	PID: 3109	PPID: 3108
+Number of process in i: 1	PID: 3110	PPID: 3108
+Number of process in j: 0	PID: 3112	PPID: 3110
+Number of process in j: 0	PID: 3111	PPID: 3109
+Number of process in j: 1	PID: 3113	PPID: 3110
+Number of process in j: 1	PID: 3114	PPID: 3109
+bash-5.0$
+
+THE END!
