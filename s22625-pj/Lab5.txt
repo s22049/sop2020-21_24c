@@ -1,0 +1,139 @@
+-------------------------------------------------------------------------------------------------------------------------------------
+
+// Zadanie 1
+
+#include <stdio.h>
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main(){
+        int input;
+        printf("PID: %d\t PPID: %d\n", getpid(), getppid());
+return 0;
+}
+
+// Zadanie 2
+
+#include <stdio.h>
+#include <unistd.h>
+
+int main(){
+        int input;
+        printf("PID: %d\t PPID: %d\n", getpid(), getppid());
+        scanf("%d", &input);
+return 0;
+}
+
+// Zadanie 3
+
+kill $PID
+
+// Zadanie 4
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main(){
+    int input;
+    pid_t pid = fork();
+
+    if(pid > 0){
+        printf("Rodzic PID: %d\tPPID: %d\n", getpid(), getppid());
+        waitpid(0, &input, 0);
+        printf("Rodzic zakonczyl czekac na swoje dziecko\n");
+    }else if(pid==0){
+        printf("Dziecko PID: %d\t PPID: %d\n", getpid(), getppid());
+    }else{
+        printf("Nie udało się utworzyć dziecka\n");
+    }
+    return 0;
+}
+
+// Zadanie 5
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+
+int main(int argc, char** argv){
+    int input;
+    int liczba=atoi(argv[1]);
+    pid_t pid = fork();
+
+    if(pid > 0){
+        int suma=0;
+        int i;
+        for(i=0; i<=liczba; i++){
+                suma+=i;
+        }
+        waitpid(0, &input, 0);
+        printf("Suma z rodzica: %d\n", suma);
+    }else if(pid==0){
+        int i;
+        for(i=1;i<=liczba;i=i+2){
+                printf("Dziecko, liczba nieparzysta: %d\n",i);
+        }
+    }else{
+        printf("Nie udało się utworzyć dziecka\n");
+    }
+    return 0;
+}
+
+// Zadanie 6
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+
+int main(){
+        int i;
+        for(i=0;i<100;i++){
+                pid_t pid = fork();
+                if(pid>0){
+                        wait(NULL);
+                        break;
+                }else{
+                        printf("i=%d  PID:%d\tPPID:%d\n",i,getpid(),getppid());
+                }
+        }
+    return 0;
+}
+
+// Zadanie 7
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+
+int main(){
+        int i;
+        pid_t masterPid = getpid();
+        printf("Masterpid: %d\n", masterPid);
+        fflush(stdout);
+        for(i=0;i<30;i++){
+                if(getpid() == masterPid){
+                        if(fork()==0){
+                                printf("i=%d  PID:%d\tPPID:%d\n",i,getpid(),getppid());
+                                fflush(stdout);
+                        }
+                }
+        }
+        if(masterPid == getpid()){
+                int status = 0;
+                waitpid(0, &status, 0);
+                printf("Rodzic zaczekal na zakonczenie potomnych\n");
+                fflush(stdout);
+        }
+    return 0;
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------
